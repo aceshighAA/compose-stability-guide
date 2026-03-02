@@ -1,4 +1,5 @@
 This repository contains an interactive HTML guide designed for senior Android developers inspired by articles in the repo: https://github.com/skydoves/compose-performance thanks to @skydoves for study collection.
+
 It provides a deep dive into how the Compose compiler evaluates types and offers practical, "Good vs. Bad" code comparisons to solve real-world performance bottlenecks.
 
 Key Features Included:
