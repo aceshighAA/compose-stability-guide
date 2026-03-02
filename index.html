@@ -1,0 +1,1373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Compose Stability Mastery</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --bg2: #0f0f1a;
+    --bg3: #14141f;
+    --card: #141420;
+    --border: #1e1e2e;
+    --accent: #7c6af7;
+    --accent2: #4ecdc4;
+    --accent3: #ff6b6b;
+    --accent4: #ffd166;
+    --text: #e8e8f0;
+    --text2: #9090b0;
+    --good: #2dd4a0;
+    --bad: #ff5c5c;
+    --warn: #ffc94d;
+    --code-bg: #0d0d18;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    overflow-x: hidden;
+  }
+
+  /* Ambient background */
+  body::before {
+    content: '';
+    position: fixed;
+    top: -30%;
+    left: -20%;
+    width: 60%;
+    height: 60%;
+    background: radial-gradient(ellipse, rgba(124,106,247,0.06) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+  body::after {
+    content: '';
+    position: fixed;
+    bottom: -20%;
+    right: -10%;
+    width: 50%;
+    height: 50%;
+    background: radial-gradient(ellipse, rgba(78,205,196,0.05) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Header */
+  header {
+    position: relative;
+    z-index: 10;
+    padding: 60px 40px 40px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .header-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    opacity: 0.9;
+  }
+  h1 {
+    font-size: clamp(36px, 6vw, 64px);
+    font-weight: 800;
+    line-height: 1.05;
+    margin-bottom: 20px;
+    background: linear-gradient(135deg, #e8e8f0 30%, #7c6af7 70%, #4ecdc4 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .subtitle {
+    font-size: 17px;
+    color: var(--text2);
+    max-width: 520px;
+    line-height: 1.6;
+    font-weight: 400;
+  }
+
+  /* Nav pills */
+  .chapter-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 20px 40px 40px;
+    max-width: 1100px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 10;
+  }
+  .nav-pill {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    padding: 8px 16px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    color: var(--text2);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: var(--card);
+    text-decoration: none;
+  }
+  .nav-pill:hover, .nav-pill.active {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(124,106,247,0.1);
+  }
+
+  /* Main container */
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 40px 80px;
+    position: relative;
+    z-index: 10;
+  }
+
+  /* Section */
+  .section {
+    margin-bottom: 64px;
+  }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+  .section-number {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    background: rgba(124,106,247,0.12);
+    border: 1px solid rgba(124,106,247,0.25);
+    padding: 4px 10px;
+    border-radius: 4px;
+  }
+  h2 {
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .section-desc {
+    font-size: 15px;
+    color: var(--text2);
+    line-height: 1.65;
+    margin-bottom: 28px;
+    max-width: 680px;
+  }
+
+  /* Cards grid */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 20px;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .card:hover {
+    border-color: rgba(124,106,247,0.4);
+    transform: translateY(-2px);
+  }
+  .card-header {
+    padding: 18px 20px 14px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .card-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-weight: 500;
+  }
+  .badge-good { background: rgba(45,212,160,0.15); color: var(--good); }
+  .badge-bad  { background: rgba(255,92,92,0.15);  color: var(--bad); }
+  .badge-warn { background: rgba(255,193,77,0.15); color: var(--warn); }
+  .badge-info { background: rgba(124,106,247,0.15); color: var(--accent); }
+  .badge-tip  { background: rgba(78,205,196,0.15); color: var(--accent2); }
+
+  .card-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .card-body { padding: 0; }
+
+  /* Code blocks */
+  pre {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    line-height: 1.7;
+    padding: 18px 20px;
+    background: var(--code-bg);
+    overflow-x: auto;
+    margin: 0;
+  }
+  .code-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 6px 20px;
+    color: var(--text2);
+    background: rgba(255,255,255,0.02);
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .dot { width: 6px; height: 6px; border-radius: 50%; }
+  .dot-good { background: var(--good); }
+  .dot-bad  { background: var(--bad); }
+  .dot-warn { background: var(--warn); }
+
+  /* Syntax highlighting */
+  .kw  { color: #c792ea; }   /* keywords */
+  .fn  { color: #82aaff; }   /* functions */
+  .an  { color: #f07178; }   /* annotations */
+  .str { color: #c3e88d; }   /* strings */
+  .cm  { color: #546e7a; font-style: italic; }   /* comments */
+  .tp  { color: #4ecdc4; }   /* types */
+  .num { color: #ffd166; }   /* numbers */
+  .prop{ color: #e8e8f0; }   /* properties */
+  .op  { color: #89ddff; }   /* operators */
+
+  /* Comparison layout */
+  .compare {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  @media (max-width: 700px) { .compare { grid-template-columns: 1fr; } }
+
+  /* Wide card */
+  .card-wide {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+  .card-wide:hover { border-color: rgba(124,106,247,0.3); }
+
+  /* Info box */
+  .info-box {
+    border-radius: 10px;
+    padding: 16px 20px;
+    font-size: 14px;
+    line-height: 1.65;
+    margin-bottom: 20px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .info-box.purple { background: rgba(124,106,247,0.08); border: 1px solid rgba(124,106,247,0.2); color: var(--text2); }
+  .info-box.green  { background: rgba(45,212,160,0.07);  border: 1px solid rgba(45,212,160,0.2);  color: var(--text2); }
+  .info-box.red    { background: rgba(255,92,92,0.07);   border: 1px solid rgba(255,92,92,0.2);   color: var(--text2); }
+  .info-box.yellow { background: rgba(255,193,77,0.07);  border: 1px solid rgba(255,193,77,0.2);  color: var(--text2); }
+  .info-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+
+  /* Decision flow */
+  .flow {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  .flow-step {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 20px;
+    border-left: 2px solid var(--border);
+    margin-left: 20px;
+    position: relative;
+    font-size: 14px;
+    color: var(--text2);
+    transition: all 0.2s;
+  }
+  .flow-step:hover { color: var(--text); background: rgba(255,255,255,0.02); }
+  .flow-step::before {
+    content: '';
+    position: absolute;
+    left: -7px;
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: var(--border);
+    border: 2px solid var(--bg);
+  }
+  .flow-step.stable::before { background: var(--good); }
+  .flow-step.unstable::before { background: var(--bad); }
+  .flow-step.unknown::before { background: var(--warn); }
+  .flow-step.runtime::before { background: var(--accent); }
+  .flow-result {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+  .res-stable   { background: rgba(45,212,160,0.15); color: var(--good); }
+  .res-unstable { background: rgba(255,92,92,0.15);  color: var(--bad); }
+  .res-unknown  { background: rgba(255,193,77,0.15); color: var(--warn); }
+  .res-runtime  { background: rgba(124,106,247,0.15); color: var(--accent); }
+
+  /* Table */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+  }
+  th {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text2);
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    background: rgba(255,255,255,0.02);
+  }
+  td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text2);
+    line-height: 1.5;
+    vertical-align: top;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255,255,255,0.015); }
+  td code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11.5px;
+    background: rgba(124,106,247,0.1);
+    color: var(--accent);
+    padding: 2px 6px;
+    border-radius: 3px;
+  }
+  td strong { color: var(--text); }
+
+  /* Checklist */
+  .checklist { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  .checklist li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 14px;
+    color: var(--text2);
+    line-height: 1.5;
+    padding: 10px 14px;
+    background: rgba(255,255,255,0.02);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+  .checklist li .check { color: var(--good); font-size: 15px; flex-shrink: 0; margin-top: 1px; }
+  .checklist li .cross { color: var(--bad);  font-size: 15px; flex-shrink: 0; margin-top: 1px; }
+
+  /* Tab system */
+  .tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 0; }
+  .tab {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    padding: 10px 18px;
+    cursor: pointer;
+    color: var(--text2);
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    user-select: none;
+  }
+  .tab:hover { color: var(--text); }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* Config block */
+  .config-block {
+    background: var(--code-bg);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+  .config-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text2);
+    padding: 10px 16px;
+    background: rgba(255,255,255,0.03);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* Reports section */
+  .report-output {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    line-height: 1.8;
+    margin-bottom: 12px;
+  }
+
+  /* Divider */
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+    margin: 48px 0;
+  }
+
+  /* Pill labels inline */
+  .inline-pill {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 4px;
+    display: inline-block;
+    vertical-align: middle;
+  }
+  .pill-stable   { background: rgba(45,212,160,0.15); color: var(--good); }
+  .pill-unstable { background: rgba(255,92,92,0.15); color: var(--bad); }
+  .pill-unknown  { background: rgba(255,193,77,0.15); color: var(--warn); }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  @media (max-width: 600px) {
+    header, .chapter-nav, .container { padding-left: 20px; padding-right: 20px; }
+  }
+
+  /* Animations */
+  @keyframes fadeSlideIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .section { animation: fadeSlideIn 0.5s ease both; }
+  .section:nth-child(2) { animation-delay: 0.05s; }
+  .section:nth-child(3) { animation-delay: 0.1s; }
+  .section:nth-child(4) { animation-delay: 0.15s; }
+  .section:nth-child(5) { animation-delay: 0.2s; }
+  .section:nth-child(6) { animation-delay: 0.25s; }
+  .section:nth-child(7) { animation-delay: 0.3s; }
+  .section:nth-child(8) { animation-delay: 0.35s; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-tag">// Jetpack Compose · Senior Dev Guide</div>
+  <h1>Stability Mastery</h1>
+  <p class="subtitle">Practical examples to eliminate unnecessary recompositions and squeeze maximum performance from Compose.</p>
+</header>
+
+<nav class="chapter-nav">
+  <a class="nav-pill active" href="#s1">01 · What is Stability</a>
+  <a class="nav-pill" href="#s2">02 · Stability Types</a>
+  <a class="nav-pill" href="#s3">03 · Common Bugs</a>
+  <a class="nav-pill" href="#s4">04 · Annotations</a>
+  <a class="nav-pill" href="#s5">05 · Config File</a>
+  <a class="nav-pill" href="#s6">06 · Compiler Reports</a>
+  <a class="nav-pill" href="#s7">07 · Advanced</a>
+  <a class="nav-pill" href="#s8">08 · Cheat Sheet</a>
+</nav>
+
+<div class="container">
+
+<!-- ─── SECTION 1 ─── -->
+<section class="section" id="s1">
+  <div class="section-header">
+    <span class="section-number">01</span>
+    <h2>What is Stability & Why It Matters</h2>
+  </div>
+  <p class="section-desc">Compose decides at runtime whether to <strong>skip</strong> or <strong>re-execute</strong> a composable based on whether its parameters changed. Stability is the signal that tells Compose "it's safe to skip".</p>
+
+  <div class="compare">
+    <div class="card">
+      <div class="card-header">
+        <span class="card-badge badge-bad">UNSTABLE</span>
+        <span class="card-title">Always recomposes</span>
+      </div>
+      <div class="card-body">
+<pre><span class="cm">// ❌ interface = Unknown stability</span>
+<span class="cm">// Compose cannot skip this</span>
+<span class="an">@Composable</span>
+<span class="kw">fun</span> <span class="fn">UserCard</span>(user: <span class="tp">User</span>) {
+    <span class="tp">Text</span>(user.name)
+    <span class="tp">Text</span>(user.email)
+}
+
+<span class="cm">// Even if user didn't change,</span>
+<span class="cm">// this ALWAYS re-executes 😱</span>
+</pre>
+        <div class="code-label"><span class="dot dot-bad"></span> User is an interface or has var fields</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span class="card-badge badge-good">STABLE</span>
+        <span class="card-title">Skips when unchanged</span>
+      </div>
+      <div class="card-body">
+<pre><span class="cm">// ✅ data class = stable (all val)</span>
+<span class="cm">// Compose CAN skip this</span>
+<span class="an">@Composable</span>
+<span class="kw">fun</span> <span class="fn">UserCard</span>(user: <span class="tp">UserData</span>) {
+    <span class="tp">Text</span>(user.name)
+    <span class="tp">Text</span>(user.email)
+}
+
+<span class="cm">// If user.equals(prev) → SKIP ✅</span>
+<span class="cm">// Zero work done! 🚀</span>
+</pre>
+        <div class="code-label"><span class="dot dot-good"></span> UserData is a stable data class</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="info-box purple">
+    <span class="info-icon">💡</span>
+    <div><strong style="color:var(--text)">Mental model:</strong> Stability = "can Compose trust <code>equals()</code> to detect changes?" If yes → safe to skip. If no → must re-run to be safe.</div>
+  </div>
+
+  <div class="card-wide">
+    <div class="card-header"><span class="card-badge badge-info">DECISION FLOW</span><span class="card-title">How Compose decides to skip</span></div>
+    <div class="flow">
+      <div class="flow-step stable">Primitive? (Int, Boolean, Float...) <span class="flow-result res-stable">STABLE ✓</span></div>
+      <div class="flow-step stable">String / Unit / Function type? <span class="flow-result res-stable">STABLE ✓</span></div>
+      <div class="flow-step stable">Has @Stable or @Immutable annotation? <span class="flow-result res-stable">STABLE ✓</span></div>
+      <div class="flow-step stable">Enum class or entry? <span class="flow-result res-stable">STABLE ✓</span></div>
+      <div class="flow-step stable">In KnownStableConstructs? (ImmutableList, Pair...) <span class="flow-result res-stable">STABLE ✓</span></div>
+      <div class="flow-step stable">In your stability config file? <span class="flow-result res-stable">STABLE ✓</span></div>
+      <div class="flow-step unknown">Interface type? <span class="flow-result res-unknown">UNKNOWN ⚠</span></div>
+      <div class="flow-step unstable">Java type? <span class="flow-result res-unstable">UNSTABLE ✗</span></div>
+      <div class="flow-step unstable">Has any var property? <span class="flow-result res-unstable">UNSTABLE ✗</span></div>
+      <div class="flow-step stable">All val fields with stable types? <span class="flow-result res-stable">STABLE ✓</span></div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ─── SECTION 2 ─── -->
+<section class="section" id="s2">
+  <div class="section-header">
+    <span class="section-number">02</span>
+    <h2>The 5 Stability Types</h2>
+  </div>
+  <p class="section-desc">The compiler represents every type as one of these five stability categories. Knowing them helps you read compiler reports.</p>
+
+  <div class="card-wide" style="margin-bottom:20px">
+    <table>
+      <thead>
+        <tr><th>Type</th><th>Meaning</th><th>Example</th><th>Skippable?</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>Certain(true)</code></td>
+          <td>Definitely stable at compile time</td>
+          <td><code>data class User(val id: Int)</code></td>
+          <td>✅ Yes</td>
+        </tr>
+        <tr>
+          <td><code>Certain(false)</code></td>
+          <td>Definitely unstable at compile time</td>
+          <td><code>class C(var x: Int)</code></td>
+          <td>❌ No</td>
+        </tr>
+        <tr>
+          <td><code>Runtime</code></td>
+          <td>Stability depends on generic type args — checked at runtime via <code>$stable</code> field</td>
+          <td><code>class Box&lt;T&gt;(val v: T)</code></td>
+          <td>⚡ Depends</td>
+        </tr>
+        <tr>
+          <td><code>Unknown</code></td>
+          <td>Interface or abstract — can't know without implementation</td>
+          <td><code>interface Repository</code></td>
+          <td>⚠️ Falls back to <code>===</code></td>
+        </tr>
+        <tr>
+          <td><code>Parameter</code></td>
+          <td>Depends on generic type parameter T</td>
+          <td><code>Wrapper&lt;T&gt;</code></td>
+          <td>⚡ Depends on T</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="compare">
+    <div class="card">
+      <div class="card-header"><span class="card-badge badge-info">RUNTIME</span><span class="card-title">Generic class → runtime check</span></div>
+      <div class="card-body">
+<pre><span class="cm">// Compiler generates $stable field</span>
+<span class="an">@StabilityInferred</span>(parameters = <span class="num">0b1</span>)
+<span class="kw">class</span> <span class="tp">Box</span>&lt;T&gt;(<span class="kw">val</span> value: T)
+
+<span class="cm">// At usage site:</span>
+<span class="kw">val</span> a = <span class="tp">Box</span>&lt;<span class="tp">Int</span>&gt;(<span class="num">42</span>)
+<span class="cm">// $stable = STABLE ✅ (Int is stable)</span>
+
+<span class="kw">val</span> b = <span class="tp">Box</span>&lt;<span class="tp">MutableList</span>&lt;<span class="tp">Int</span>&gt;&gt;(<span class="fn">mutableListOf</span>())
+<span class="cm">// $stable = UNSTABLE ❌</span>
+</pre>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><span class="card-badge badge-warn">UNKNOWN</span><span class="card-title">Interface → unknown, uses ===</span></div>
+      <div class="card-body">
+<pre><span class="cm">// Interface: compiler can't know</span>
+<span class="cm">// which implementation will come</span>
+<span class="kw">interface</span> <span class="tp">DataSource</span> {
+    <span class="kw">fun</span> <span class="fn">load</span>(): <span class="tp">String</span>
+}
+
+<span class="an">@Composable</span>
+<span class="kw">fun</span> <span class="fn">Screen</span>(src: <span class="tp">DataSource</span>) {
+    <span class="cm">// Falls back to reference ===</span>
+    <span class="cm">// New lambda each recomp = bad!</span>
+}
+</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ─── SECTION 3 ─── -->
+<section class="section" id="s3">
+  <div class="section-header">
+    <span class="section-number">03</span>
+    <h2>The 5 Common Bugs That Kill Performance</h2>
+  </div>
+  <p class="section-desc">These are the most frequent stability killers in real codebases. Each one causes unnecessary recompositions.</p>
+
+  <!-- Bug 1 -->
+  <div class="card-wide" style="margin-bottom:24px">
+    <div class="card-header">
+      <span class="card-badge badge-bad">BUG 1</span>
+      <span class="card-title">Accidental var in data class</span>
+    </div>
+    <div class="tabs" id="tabs1">
+      <div class="tab active" onclick="switchTab('tabs1','bad1')">❌ Problem</div>
+      <div class="tab" onclick="switchTab('tabs1','good1')">✅ Fix</div>
+    </div>
+    <div id="bad1" class="tab-content active">
+<pre><span class="cm">// ONE var field = entire class is UNSTABLE</span>
+<span class="kw">data class</span> <span class="tp">UserState</span>(
+    <span class="kw">val</span> name: <span class="tp">String</span>,
+    <span class="kw">var</span> loading: <span class="tp">Boolean</span>,   <span class="cm">// ← poison ☠️</span>
+    <span class="kw">val</span> email: <span class="tp">String</span>
+)
+
+<span class="an">@Composable</span>
+<span class="kw">fun</span> <span class="fn">Profile</span>(state: <span class="tp">UserState</span>) {
+    <span class="cm">// NEVER skipped, always re-runs</span>
+}</pre>
+      <div class="code-label"><span class="dot dot-bad"></span> var → Certain(stable = false)</div>
+    </div>
+    <div id="good1" class="tab-content">
+<pre><span class="cm">// All val = STABLE ✅</span>
+<span class="kw">data class</span> <span class="tp">UserState</span>(
+    <span class="kw">val</span> name: <span class="tp">String</span>,
+    <span class="kw">val</span> loading: <span class="tp">Boolean</span>,   <span class="cm">// ← val ✅</span>
+    <span class="kw">val</span> email: <span class="tp">String</span>
+)
+
+<span class="cm">// Create new instance to "update":</span>
+state = state.copy(loading = <span class="kw">true</span>)
+<span class="cm">// data class copy() is idiomatic ✅</span></pre>
+      <div class="code-label"><span class="dot dot-good"></span> All val → Certain(stable = true)</div>
+    </div>
+  </div>
+
+  <!-- Bug 2 -->
+  <div class="card-wide" style="margin-bottom:24px">
+    <div class="card-header">
+      <span class="card-badge badge-bad">BUG 2</span>
+      <span class="card-title">Mutable collections as parameters</span>
+    </div>
+    <div class="tabs" id="tabs2">
+      <div class="tab active" onclick="switchTab('tabs2','bad2')">❌ Problem</div>
+      <div class="tab" onclick="switchTab('tabs2','good2a')">✅ Fix A — ImmutableList</div>
+      <div class="tab" onclick="switchTab('tabs2','good2b')">✅ Fix B — Config</div>
+    </div>
+    <div id="bad2" class="tab-content active">
+<pre><span class="cm">// List = interface = Unknown stability</span>
+<span class="cm">// MutableList = unstable</span>
+<span class="an">@Composable</span>
+<span class="kw">fun</span> <span class="fn">ItemList</span>(items: <span class="tp">List</span>&lt;<span class="tp">String</span>&gt;) {
+    <span class="cm">// ⚠️ List is an interface → Unknown</span>
+    <span class="cm">// Falls back to reference comparison</span>
+    <span class="cm">// listOf() creates new reference each time!</span>
+    items.<span class="fn">forEach</span> { <span class="tp">Text</span>(<span class="fn">it</span>) }
+}</pre>
+      <div class="code-label"><span class="dot dot-bad"></span> List interface = Unknown</div>
+    </div>
+    <div id="good2a" class="tab-content">
+<pre><span class="cm">// ImmutableList is in KnownStableConstructs</span>
+<span class="kw">import</span> kotlinx.collections.immutable.ImmutableList
+<span class="kw">import</span> kotlinx.collections.immutable.persistentListOf
+
+<span class="an">@Composable</span>
+<span class="kw">fun</span> <span class="fn">ItemList</span>(items: <span class="tp">ImmutableList</span>&lt;<span class="tp">String</span>&gt;) {
+    <span class="cm">// ✅ Stable! Compose can skip safely</span>
+    items.<span class="fn">forEach</span> { <span class="tp">Text</span>(<span class="fn">it</span>) }
+}
+
+<span class="cm">// Usage:</span>
+<span class="fn">ItemList</span>(<span class="fn">persistentListOf</span>(<span class="str">"A"</span>, <span class="str">"B"</span>, <span class="str">"C"</span>))</pre>
+      <div class="code-label"><span class="dot dot-good"></span> kotlinx.collections.immutable in build.gradle</div>
+    </div>
+    <div id="good2b" class="tab-content">
+<pre><span class="cm">// stability_config.conf:</span>
+kotlin.collections.List
+kotlin.collections.Map
+kotlin.collections.Set
+
+<span class="cm">// Then in build.gradle.kts:</span>
+composeCompiler {
+    stabilityConfigurationFile =
+        rootProject.layout.projectDirectory
+            .<span class="fn">file</span>(<span class="str">"stability_config.conf"</span>)
+}
+
+<span class="cm">// ⚠️ Warning: you're promising these</span>
+<span class="cm">// are stable — use carefully!</span></pre>
+      <div class="code-label"><span class="dot dot-warn"></span> Only safe if you never mutate the list</div>
+    </div>
+  </div>
+
+  <!-- Bug 3 -->
+  <div class="card-wide" style="margin-bottom:24px">
+    <div class="card-header">
+      <span class="card-badge badge-bad">BUG 3</span>
+      <span class="card-title">Interface / abstract class parameters</span>
+    </div>
+    <div class="tabs" id="tabs3">
+      <div class="tab active" onclick="switchTab('tabs3','bad3')">❌ Problem</div>
+      <div class="tab" onclick="switchTab('tabs3','good3a')">✅ Fix A — @Stable</div>
+      <div class="tab" onclick="switchTab('tabs3','good3b')">✅ Fix B — Concrete</div>
+    </div>
+    <div id="bad3" class="tab-content active">
+<pre><span class="cm">// Interface → Unknown stability</span>
+<span class="kw">interface</span> <span class="tp">ViewModel</span> {
+    <span class="kw">val</span> uiState: <span class="tp">UiState</span>
+    <span class="kw">fun</span> <span class="fn">onAction</span>(action: <span class="tp">Action</span>)
+}
+
+<span class="an">@Composable</span>
+<span class="kw">fun</span> <span class="fn">Screen</span>(vm: <span class="tp">ViewModel</span>) {
+    <span class="cm">// ⚠️ Unknown stability</span>
+    <span class="cm">// Compose uses === for comparison</span>
+    <span class="cm">// Same object reference? Only then skip</span>
+}</pre>
+    </div>
+    <div id="good3a" class="tab-content">
+<pre><span class="cm">// @Stable on interface = trusted</span>
+<span class="an">@Stable</span>
+<span class="kw">interface</span> <span class="tp">ViewModel</span> {
+    <span class="kw">val</span> uiState: <span class="tp">UiState</span>
+    <span class="kw">fun</span> <span class="fn">onAction</span>(action: <span class="tp">Action</span>)
+}
+
+<span class="an">@Composable</span>
+<span class="kw">fun</span> <span class="fn">Screen</span>(vm: <span class="tp">ViewModel</span>) {
+    <span class="cm">// ✅ Stable — you promise</span>
+    <span class="cm">// all implementations are stable</span>
+}</pre>
+      <div class="code-label"><span class="dot dot-warn"></span> You own the contract — ensure implementations comply</div>
+    </div>
+    <div id="good3b" class="tab-content">
+<pre><span class="cm">// Use concrete type directly</span>
+<span class="kw">data class</span> <span class="tp">UiState</span>(
+    <span class="kw">val</span> isLoading: <span class="tp">Boolean</span>,
+    <span class="kw">val</span> items: <span class="tp">ImmutableList</span>&lt;<span class="tp">Item</span>&gt;
+)
+
+<span class="an">@Composable</span>
+<span class="kw">fun</span> <span class="fn">Screen</span>(
+    uiState: <span class="tp">UiState</span>,         <span class="cm">// ← stable ✅</span>
+    onAction: (<span class="tp">Action</span>) -&gt; <span class="tp">Unit</span>  <span class="cm">// ← lambda stable ✅</span>
+) {
+    <span class="cm">// Perfect — skippable! ✅</span>
+}</pre>
+    </div>
+  </div>
+
+  <!-- Bug 4 -->
+  <div class="card-wide" style="margin-bottom:24px">
+    <div class="card-header">
+      <span class="card-badge badge-bad">BUG 4</span>
+      <span class="card-title">Third-party library types</span>
+    </div>
+    <div class="tabs" id="tabs4">
+      <div class="tab active" onclick="switchTab('tabs4','bad4')">❌ Problem</div>
+      <div class="tab" onclick="switchTab('tabs4','good4')">✅ Fix</div>
+    </div>
+    <div id="bad4" class="tab-content active">
+<pre><span class="cm">// Third-party class — no @StabilityInferred</span>
+<span class="cm">// → Unstable by default</span>
+<span class="kw">import</span> com.squareup.moshi.JsonClass
+
+<span class="an">@JsonClass</span>(generateAdapter = <span class="kw">true</span>)
+<span class="kw">data class</span> <span class="tp">ApiResponse</span>(
+    <span class="kw">val</span> id: <span class="tp">Int</span>,
+    <span class="kw">val</span> title: <span class="tp">String</span>
+)
+
+<span class="an">@Composable</span>
+<span class="kw">fun</span> <span class="fn">Card</span>(response: <span class="tp">ApiResponse</span>) {
+    <span class="cm">// ❌ Marked unstable even though</span>
+    <span class="cm">// it's all-val, because it's from</span>
+    <span class="cm">// an external module</span>
+}</pre>
+    </div>
+    <div id="good4" class="tab-content">
+<pre><span class="cm">// Option A: stability_config.conf</span>
+com.squareup.moshi.JsonClass
+
+<span class="cm">// Option B: wrapper data class</span>
+<span class="kw">data class</span> <span class="tp">CardModel</span>(
+    <span class="kw">val</span> id: <span class="tp">Int</span>,
+    <span class="kw">val</span> title: <span class="tp">String</span>
+)
+
+<span class="cm">// Map in ViewModel, not in UI:</span>
+<span class="kw">fun</span> <span class="tp">ApiResponse</span>.<span class="fn">toCardModel</span>() =
+    <span class="tp">CardModel</span>(id = id, title = title)
+
+<span class="an">@Composable</span>
+<span class="kw">fun</span> <span class="fn">Card</span>(model: <span class="tp">CardModel</span>) {
+    <span class="cm">// ✅ Fully stable, skippable</span>
+}</pre>
+      <div class="code-label"><span class="dot dot-good"></span> Wrapper pattern: map 3rd-party → your own stable models</div>
+    </div>
+  </div>
+
+  <!-- Bug 5 -->
+  <div class="card-wide">
+    <div class="card-header">
+      <span class="card-badge badge-bad">BUG 5</span>
+      <span class="card-title">Unstable superclass / inheritance</span>
+    </div>
+    <div class="tabs" id="tabs5">
+      <div class="tab active" onclick="switchTab('tabs5','bad5')">❌ Problem</div>
+      <div class="tab" onclick="switchTab('tabs5','good5')">✅ Fix</div>
+    </div>
+    <div id="bad5" class="tab-content active">
+<pre><span class="cm">// Unstable base poisons ALL subclasses</span>
+<span class="kw">open class</span> <span class="tp">BaseModel</span>(
+    <span class="kw">var</span> id: <span class="tp">Int</span>   <span class="cm">// ← var in base = death 💀</span>
+)
+
+<span class="kw">class</span> <span class="tp">UserModel</span>(
+    <span class="kw">val</span> name: <span class="tp">String</span>
+) : <span class="tp">BaseModel</span>(<span class="num">0</span>)
+
+<span class="cm">// UserModel: fields all-val? Doesn't matter.</span>
+<span class="cm">// Superclass has var → UserModel is UNSTABLE</span></pre>
+    </div>
+    <div id="good5" class="tab-content">
+<pre><span class="cm">// Fix: Make base class immutable</span>
+<span class="kw">open class</span> <span class="tp">BaseModel</span>(
+    <span class="kw">val</span> id: <span class="tp">Int</span>   <span class="cm">// ← val ✅</span>
+)
+
+<span class="kw">data class</span> <span class="tp">UserModel</span>(
+    <span class="kw">val</span> name: <span class="tp">String</span>,
+    <span class="kw">val</span> baseId: <span class="tp">Int</span>   <span class="cm">// prefer composition</span>
+)
+<span class="cm">// Better: flatten hierarchy entirely</span>
+<span class="cm">// Inheritance in UiState = common mistake</span></pre>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ─── SECTION 4 ─── -->
+<section class="section" id="s4">
+  <div class="section-header">
+    <span class="section-number">04</span>
+    <h2>Stability Annotations</h2>
+  </div>
+
+  <div class="compare">
+    <div class="card">
+      <div class="card-header"><span class="card-badge badge-good">@Immutable</span><span class="card-title">Truly frozen — strongest guarantee</span></div>
+      <div class="card-body">
+<pre><span class="cm">// Contract: nothing changes EVER</span>
+<span class="an">@Immutable</span>
+<span class="kw">data class</span> <span class="tp">Theme</span>(
+    <span class="kw">val</span> primary: <span class="tp">Color</span>,
+    <span class="kw">val</span> background: <span class="tp">Color</span>
+)
+
+<span class="cm">// Extra benefit: constructor calls</span>
+<span class="cm">// become "static expressions"</span>
+<span class="cm">// → Better lambda memoization</span>
+<span class="kw">val</span> lambda = { theme.primary }
+<span class="cm">// ↑ Compiler can optimize this more</span>
+<span class="cm">// aggressively with @Immutable</span>
+</pre>
+        <div class="code-label"><span class="dot dot-good"></span> Use for: config objects, themes, constants</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><span class="card-badge badge-info">@Stable</span><span class="card-title">Controlled mutability — flexible</span></div>
+      <div class="card-body">
+<pre><span class="cm">// Contract:</span>
+<span class="cm">// 1. equals() works correctly</span>
+<span class="cm">// 2. State changes trigger recomposition</span>
+<span class="an">@Stable</span>
+<span class="kw">class</span> <span class="tp">CartState</span> {
+    <span class="kw">private var</span> _items <span class="kw">by</span> <span class="fn">mutableStateOf</span>(<span class="fn">listOf</span>&lt;<span class="tp">Item</span>&gt;())
+    <span class="kw">val</span> items: <span class="tp">List</span>&lt;<span class="tp">Item</span>&gt; <span class="kw">get</span>() = _items
+
+    <span class="kw">fun</span> <span class="fn">add</span>(item: <span class="tp">Item</span>) {
+        _items = _items + item
+        <span class="cm">// mutableStateOf auto-triggers</span>
+        <span class="cm">// recomposition ✅</span>
+    }
+}
+</pre>
+        <div class="code-label"><span class="dot dot-good"></span> Use for: state holders, observable classes</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-wide" style="margin-top:20px">
+    <div class="card-header"><span class="card-badge badge-tip">@StableMarker</span><span class="card-title">Create your own stability annotation</span></div>
+    <div class="card-body">
+<pre><span class="cm">// Define once in your project:</span>
+<span class="an">@StableMarker</span>
+<span class="an">@Target</span>(AnnotationTarget.CLASS)
+<span class="an">@Retention</span>(AnnotationRetention.BINARY)
+<span class="kw">annotation class</span> <span class="tp">UiModel</span>
+
+<span class="cm">// Use across your codebase:</span>
+<span class="an">@UiModel</span>
+<span class="kw">data class</span> <span class="tp">ProductCard</span>(
+    <span class="kw">val</span> id: <span class="tp">String</span>,
+    <span class="kw">val</span> title: <span class="tp">String</span>,
+    <span class="kw">val</span> price: <span class="tp">Double</span>
+)
+
+<span class="an">@UiModel</span>
+<span class="kw">data class</span> <span class="tp">OrderSummary</span>(
+    <span class="kw">val</span> orderId: <span class="tp">String</span>,
+    <span class="kw">val</span> total: <span class="tp">Double</span>
+)
+<span class="cm">// Both treated as @Stable ✅</span></pre>
+      <div class="code-label"><span class="dot dot-good"></span> Great pattern for large teams — semantic + performance in one annotation</div>
+    </div>
+  </div>
+
+  <div class="info-box yellow" style="margin-top:16px">
+    <span class="info-icon">⚠️</span>
+    <div><strong style="color:var(--text)">Key difference:</strong> <code>@Immutable</code> enables extra compile-time optimization where constructor calls become <em>static expressions</em> (better lambda memoization). <code>@Stable</code> allows private mutability but doesn't get this bonus. When in doubt on a pure data class: use <code>@Immutable</code>.</div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ─── SECTION 5 ─── -->
+<section class="section" id="s5">
+  <div class="section-header">
+    <span class="section-number">05</span>
+    <h2>Stability Configuration File</h2>
+  </div>
+  <p class="section-desc">The most powerful tool for fixing stability on third-party types you don't control. One file, zero code changes to your models.</p>
+
+  <div class="compare" style="margin-bottom:20px">
+    <div class="config-block">
+      <div class="config-title">📄 stability_config.conf</div>
+<pre style="border-radius:0; border:none; padding:16px">
+<span class="cm">// ── Exact class ──────────────────</span>
+com.google.gson.JsonObject
+
+<span class="cm">// ── Entire package (recursive) ───</span>
+com.example.models.**
+
+<span class="cm">// ── Single-level wildcard ─────────</span>
+com.example.*.dto
+
+<span class="cm">// ── Generic: * = matters, _ = skip</span>
+kotlin.collections.List            <span class="cm">// no generics</span>
+com.example.Container&lt;*&gt;           <span class="cm">// T matters</span>
+com.example.Either&lt;*,*&gt;            <span class="cm">// both matter</span>
+com.example.Cached&lt;*,_&gt;            <span class="cm">// only first</span>
+com.example.Complex&lt;*,_,*&gt;         <span class="cm">// 1st and 3rd</span>
+</pre>
+    </div>
+
+    <div class="config-block">
+      <div class="config-title">🔧 build.gradle.kts</div>
+<pre style="border-radius:0; border:none; padding:16px">
+<span class="fn">plugins</span> {
+    <span class="fn">id</span>(<span class="str">"org.jetbrains.kotlin.plugin.compose"</span>)
+}
+
+composeCompiler {
+    stabilityConfigurationFile =
+        rootProject.layout
+            .projectDirectory
+            .<span class="fn">file</span>(<span class="str">"stability_config.conf"</span>)
+
+    <span class="cm">// Optional: enable reports</span>
+    reportsDestination =
+        layout.buildDirectory
+            .<span class="fn">dir</span>(<span class="str">"compose_reports"</span>)
+    metricsDestination =
+        layout.buildDirectory
+            .<span class="fn">dir</span>(<span class="str">"compose_metrics"</span>)
+}
+</pre>
+    </div>
+  </div>
+
+  <div class="card-wide">
+    <div class="card-header"><span class="card-badge badge-info">PATTERN GUIDE</span><span class="card-title">Understanding generic parameter syntax</span></div>
+    <div class="card-body">
+<pre><span class="cm">// * = this type param's stability MATTERS</span>
+<span class="cm">// _ = ignore this type param</span>
+
+<span class="cm">// Pair&lt;A,B&gt; — both A and B matter:</span>
+kotlin.Pair&lt;*,*&gt;
+<span class="cm">// If Pair&lt;String, MutableList&gt; → UNSTABLE (MutableList is *)</span>
+<span class="cm">// If Pair&lt;String, Int&gt; → STABLE</span>
+
+<span class="cm">// Result&lt;T&gt; — T matters:</span>
+kotlin.Result&lt;*&gt;
+
+<span class="cm">// Hypothetical cache where key type is irrelevant:</span>
+com.example.Cache&lt;_,*&gt;
+<span class="cm">// Only value type (2nd param) affects stability</span>
+<span class="cm">// Cache&lt;Any, StableData&gt; → STABLE (key ignored)</span>
+</pre>
+      <div class="code-label"><span class="dot dot-good"></span> Bitmask under the hood: 0b1 = first param, 0b10 = second, 0b11 = both</div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ─── SECTION 6 ─── -->
+<section class="section" id="s6">
+  <div class="section-header">
+    <span class="section-number">06</span>
+    <h2>Compiler Reports — Find What's Broken</h2>
+  </div>
+  <p class="section-desc">Enable reports to see exactly which composables are skippable and why your classes are unstable. This is your performance X-ray.</p>
+
+  <div class="config-block" style="margin-bottom:20px">
+    <div class="config-title">🔧 Enable in build.gradle.kts</div>
+<pre style="padding:16px; border-radius:0; border:none">
+composeCompiler {
+    reportsDestination = layout.buildDirectory.<span class="fn">dir</span>(<span class="str">"compose_reports"</span>)
+    metricsDestination = layout.buildDirectory.<span class="fn">dir</span>(<span class="str">"compose_metrics"</span>)
+}
+<span class="cm">// Then: ./gradlew assembleRelease</span>
+<span class="cm">// Find reports at: build/compose_reports/</span>
+</pre>
+  </div>
+
+  <div class="cards-grid">
+    <div class="card">
+      <div class="card-header"><span class="card-badge badge-info">FILE 1</span><span class="card-title">module-classes.txt</span></div>
+      <div class="card-body">
+<pre><span class="cm">// What you WANT to see:</span>
+<span class="kw">stable</span> <span class="kw">class</span> <span class="tp">User</span> {
+  <span class="kw">stable</span> <span class="kw">val</span> id: <span class="tp">Int</span>
+  <span class="kw">stable</span> <span class="kw">val</span> name: <span class="tp">String</span>
+}
+
+<span class="cm">// What you DON'T want:</span>
+<span class="kw">unstable</span> <span class="kw">class</span> <span class="tp">Counter</span> {
+  <span class="kw">unstable</span> <span class="kw">var</span> count: <span class="tp">Int</span>
+}
+
+<span class="cm">// Generic — OK, depends on T:</span>
+<span class="kw">runtime</span> <span class="kw">stable</span> <span class="kw">class</span> <span class="tp">Box</span>&lt;T&gt; {
+  <span class="kw">stable</span> <span class="kw">val</span> value: T
+}</pre>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><span class="card-badge badge-info">FILE 2</span><span class="card-title">module-composables.txt</span></div>
+      <div class="card-body">
+<pre><span class="cm">// GOOD — skippable ✅</span>
+<span class="kw">restartable</span> <span class="kw">skippable</span>
+<span class="fn">fun</span> <span class="fn">UserCard</span>(
+  <span class="kw">stable</span> user: <span class="tp">User</span>
+)
+
+<span class="cm">// BAD — can't skip ❌</span>
+<span class="kw">restartable</span>
+<span class="fn">fun</span> <span class="fn">CounterCard</span>(
+  <span class="kw">unstable</span> counter: <span class="tp">Counter</span>
+)
+<span class="cm">// ↑ Find these and fix them!</span>
+<span class="cm">// Especially in LazyColumn items</span></pre>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><span class="card-badge badge-info">FILE 3</span><span class="card-title">module-module.json</span></div>
+      <div class="card-body">
+<pre>{
+  <span class="str">"skippableComposables"</span>: <span class="num">45</span>,
+  <span class="str">"restartableComposables"</span>: <span class="num">50</span>,
+  <span class="str">"readonlyComposables"</span>: <span class="num">5</span>,
+  <span class="str">"totalComposables"</span>: <span class="num">100</span>
+}
+
+<span class="cm">// 🎯 Your goal:</span>
+<span class="cm">// skippable / restartable → 90%+</span>
+<span class="cm">// Focus on screens, list items,</span>
+<span class="cm">// and frequently-recomposed nodes</span></pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="info-box green" style="margin-top:20px">
+    <span class="info-icon">🎯</span>
+    <div><strong style="color:var(--text)">Pro tip:</strong> Prioritize fixing composables inside <code>LazyColumn</code> / <code>LazyRow</code> item slots. Each list item being unskippable means every scroll re-runs all visible items. This is where stability bugs have the most visible FPS impact.</div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ─── SECTION 7 ─── -->
+<section class="section" id="s7">
+  <div class="section-header">
+    <span class="section-number">07</span>
+    <h2>Advanced Patterns</h2>
+  </div>
+
+  <!-- Delegated properties -->
+  <div class="card-wide" style="margin-bottom:20px">
+    <div class="card-header"><span class="card-badge badge-tip">ADVANCED</span><span class="card-title">Delegated var — the exception to the var rule</span></div>
+    <div class="card-body">
+<pre><span class="cm">// Delegated var is NOT automatically unstable!</span>
+<span class="cm">// The compiler checks the delegate type instead.</span>
+
+<span class="an">@Stable</span>
+<span class="kw">class</span> <span class="tp">FormState</span> {
+    <span class="cm">// ✅ var delegated to MutableState</span>
+    <span class="cm">// Compose tracks this automatically</span>
+    <span class="kw">var</span> username: <span class="tp">String</span> <span class="kw">by</span> <span class="fn">mutableStateOf</span>(<span class="str">""</span>)
+    <span class="kw">var</span> password: <span class="tp">String</span> <span class="kw">by</span> <span class="fn">mutableStateOf</span>(<span class="str">""</span>)
+    <span class="kw">var</span> isValid: <span class="tp">Boolean</span> <span class="kw">by</span> <span class="fn">mutableStateOf</span>(<span class="kw">false</span>)
+}
+
+<span class="cm">// This is stable because:</span>
+<span class="cm">// 1. Annotated with @Stable</span>
+<span class="cm">// 2. All mutations go through mutableStateOf</span>
+<span class="cm">// 3. Compose will be notified of changes</span></pre>
+      <div class="code-label"><span class="dot dot-good"></span> var delegated to mutableStateOf = safe</div>
+    </div>
+  </div>
+
+  <!-- Enum / protobuf -->
+  <div class="compare" style="margin-bottom:20px">
+    <div class="card">
+      <div class="card-header"><span class="card-badge badge-good">FREE</span><span class="card-title">Enums are always stable</span></div>
+      <div class="card-body">
+<pre><span class="cm">// Enums = always Certain(true)</span>
+<span class="cm">// No annotation needed!</span>
+<span class="kw">enum class</span> <span class="tp">LoadState</span> {
+    IDLE, LOADING, SUCCESS, ERROR
+}
+
+<span class="an">@Composable</span>
+<span class="kw">fun</span> <span class="fn">StatusBadge</span>(state: <span class="tp">LoadState</span>) {
+    <span class="cm">// ✅ Fully skippable, free!</span>
+    <span class="kw">when</span>(state) {
+        <span class="tp">LoadState</span>.LOADING -&gt; <span class="tp">Spinner</span>()
+        <span class="tp">LoadState</span>.ERROR -&gt; <span class="tp">ErrorView</span>()
+        <span class="kw">else</span> -&gt; {}
+    }
+}</pre>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><span class="card-badge badge-good">FREE</span><span class="card-title">Protobuf — auto stable</span></div>
+      <div class="card-body">
+<pre><span class="cm">// Generated proto classes that extend:</span>
+<span class="cm">// GeneratedMessageLite or GeneratedMessage</span>
+<span class="cm">// → Compiler marks as stable ✅</span>
+
+<span class="cm">// No config needed, works out of box</span>
+<span class="an">@Composable</span>
+<span class="kw">fun</span> <span class="fn">ProtoCard</span>(msg: <span class="tp">UserProto</span>) {
+    <span class="cm">// ✅ Stable if UserProto extends</span>
+    <span class="cm">// GeneratedMessageLite (it does)</span>
+    <span class="tp">Text</span>(msg.name)
+}</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- Inline class -->
+  <div class="card-wide" style="margin-bottom:20px">
+    <div class="card-header"><span class="card-badge badge-tip">ADVANCED</span><span class="card-title">Inline / value classes — stability flows through</span></div>
+    <div class="card-body">
+<pre><span class="cm">// Stability of value class = stability of wrapped type</span>
+<span class="an">@JvmInline</span>
+<span class="kw">value class</span> <span class="tp">UserId</span>(<span class="kw">val</span> value: <span class="tp">Int</span>)
+<span class="cm">// ✅ Stable — Int is stable</span>
+
+<span class="an">@JvmInline</span>
+<span class="kw">value class</span> <span class="tp">Tag</span>(<span class="kw">val</span> value: <span class="tp">String</span>)
+<span class="cm">// ✅ Stable — String is stable</span>
+
+<span class="cm">// Override with @Stable when underlying type is unstable:</span>
+<span class="an">@JvmInline</span>
+<span class="an">@Stable</span>
+<span class="kw">value class</span> <span class="tp">StableWrapper</span>(<span class="kw">val</span> list: <span class="tp">MutableList</span>&lt;<span class="tp">Int</span>&gt;)
+<span class="cm">// ✅ @Stable overrides MutableList's instability</span>
+<span class="cm">// ⚠️ YOU are responsible for the contract!</span></pre>
+      <div class="code-label"><span class="dot dot-good"></span> Value classes are a great tool to add type safety AND maintain stability</div>
+    </div>
+  </div>
+
+  <!-- Recursive types -->
+  <div class="card-wide">
+    <div class="card-header"><span class="card-badge badge-warn">GOTCHA</span><span class="card-title">Recursive / self-referential types → always unstable</span></div>
+    <div class="card-body">
+<pre><span class="cm">// ❌ Recursive type = compiler cycle detection</span>
+<span class="cm">// → Returns Unstable conservatively</span>
+<span class="kw">data class</span> <span class="tp">TreeNode</span>(
+    <span class="kw">val</span> value: <span class="tp">Int</span>,
+    <span class="kw">val</span> left: <span class="tp">TreeNode</span>?,   <span class="cm">// ← cycle!</span>
+    <span class="kw">val</span> right: <span class="tp">TreeNode</span>?  <span class="cm">// ← cycle!</span>
+)
+<span class="cm">// Even though logically stable, compiler marks UNSTABLE</span>
+
+<span class="cm">// Workaround: force-annotate</span>
+<span class="an">@Immutable</span>
+<span class="kw">data class</span> <span class="tp">TreeNode</span>(
+    <span class="kw">val</span> value: <span class="tp">Int</span>,
+    <span class="kw">val</span> left: <span class="tp">TreeNode</span>?,
+    <span class="kw">val</span> right: <span class="tp">TreeNode</span>?
+)
+<span class="cm">// ✅ Annotation overrides cycle detection</span></pre>
+      <div class="code-label"><span class="dot dot-warn"></span> Limitation of the inference algorithm — override manually when safe</div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ─── SECTION 8 ─── -->
+<section class="section" id="s8">
+  <div class="section-header">
+    <span class="section-number">08</span>
+    <h2>Senior Dev Cheat Sheet</h2>
+  </div>
+
+  <div class="card-wide" style="margin-bottom:20px">
+    <div class="card-header"><span class="card-badge badge-info">QUICK REF</span><span class="card-title">Stability at a glance</span></div>
+    <table>
+      <thead>
+        <tr><th>Type / Pattern</th><th>Stability</th><th>Action Needed</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>Int</code>, <code>Boolean</code>, <code>String</code>, lambdas</td><td>✅ Stable</td><td>None</td></tr>
+        <tr><td><code>enum class</code></td><td>✅ Stable</td><td>None</td></tr>
+        <tr><td><code>data class</code> all-<code>val</code>, stable fields</td><td>✅ Stable</td><td>None</td></tr>
+        <tr><td><code>data class</code> with any <code>var</code></td><td>❌ Unstable</td><td>Change to <code>val</code>, use <code>copy()</code></td></tr>
+        <tr><td><code>List&lt;T&gt;</code>, <code>Map</code>, <code>Set</code> (interfaces)</td><td>⚠️ Unknown</td><td>Use <code>ImmutableList</code> or add to config</td></tr>
+        <tr><td><code>interface</code> parameter</td><td>⚠️ Unknown</td><td>Add <code>@Stable</code> or use concrete type</td></tr>
+        <tr><td><code>abstract class</code></td><td>⚠️ Unknown</td><td>Add <code>@Stable</code> if you control it</td></tr>
+        <tr><td>Java type</td><td>❌ Unstable</td><td>Wrap in Kotlin data class</td></tr>
+        <tr><td>3rd-party class</td><td>❌ Unstable</td><td>Wrap or add to <code>stability_config.conf</code></td></tr>
+        <tr><td>Generic <code>Box&lt;T&gt;</code></td><td>⚡ Runtime</td><td>Stable when T is stable</td></tr>
+        <tr><td>Class inheriting unstable base</td><td>❌ Unstable</td><td>Fix base or flatten hierarchy</td></tr>
+        <tr><td><code>var</code> delegated to <code>mutableStateOf</code></td><td>✅ OK</td><td>Add <code>@Stable</code> to class</td></tr>
+        <tr><td>Protobuf generated class</td><td>✅ Stable</td><td>None — auto-detected</td></tr>
+        <tr><td>Recursive / self-ref type</td><td>❌ Unstable</td><td>Add <code>@Immutable</code> if truly immutable</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card-wide">
+    <div class="card-header"><span class="card-badge badge-tip">ACTION PLAN</span><span class="card-title">Performance audit workflow</span></div>
+    <div class="card-body" style="padding:20px">
+      <ul class="checklist">
+        <li><span class="check">1</span> <div>Enable compiler reports in <code>build.gradle.kts</code> → run <code>./gradlew assembleRelease</code></div></li>
+        <li><span class="check">2</span> <div>Open <code>build/compose_reports/module-composables.txt</code> → search for <code>restartable</code> WITHOUT <code>skippable</code></div></li>
+        <li><span class="check">3</span> <div>Check <code>module-classes.txt</code> for <code>unstable</code> classes used in those composables</div></li>
+        <li><span class="check">4</span> <div>Fix top offenders: <code>var</code> → <code>val</code>, <code>List</code> → <code>ImmutableList</code>, interfaces → <code>@Stable</code></div></li>
+        <li><span class="check">5</span> <div>Add 3rd-party types to <code>stability_config.conf</code>, wire it in Gradle</div></li>
+        <li><span class="check">6</span> <div>Re-run reports — verify <code>skippable</code> count improves</div></li>
+        <li><span class="check">7</span> <div>Prioritize: LazyColumn items → screen-level composables → inner composables</div></li>
+        <li><span class="check">8</span> <div>Use Layout Inspector → Recomposition Counts to confirm impact at runtime</div></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+</div><!-- /container -->
+
+<script>
+function switchTab(groupId, activeId) {
+  const group = document.getElementById(groupId);
+  group.querySelectorAll('.tab').forEach((t, i) => {
+    t.classList.remove('active');
+  });
+  const tabs = group.querySelectorAll('.tab');
+  const contents = group.parentElement.querySelectorAll('.tab-content');
+
+  contents.forEach(c => c.classList.remove('active'));
+  document.getElementById(activeId).classList.add('active');
+
+  // Find which tab was clicked by activeId pattern
+  const ids = ['bad','good'];
+  const allContents = Array.from(group.parentElement.querySelectorAll('.tab-content'));
+  const clickedIndex = allContents.findIndex(c => c.id === activeId);
+  tabs[clickedIndex].classList.add('active');
+}
+
+// Nav pill active on scroll
+const sections = document.querySelectorAll('section[id]');
+const navPills = document.querySelectorAll('.nav-pill');
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(s => {
+    if (window.scrollY >= s.offsetTop - 100) current = s.id;
+  });
+  navPills.forEach(p => {
+    p.classList.remove('active');
+    if (p.getAttribute('href') === '#' + current) p.classList.add('active');
+  });
+}, { passive: true });
+</script>
+
+</body>
+</html>
