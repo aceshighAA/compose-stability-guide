@@ -16,3 +16,4 @@ Interactive Decision Flow: A logic-based walkthrough of how Compose determines i
 
 8-Step Runtime Checklist: A concise checklist for auditing and fixing recomposition issues using the Layout Inspector.
 
+Direct access link : https://aceshighaa.github.io/compose-stability-guide/
